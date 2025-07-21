@@ -76,3 +76,27 @@ h1 {
   background-color: #f592b2;
   transform: rotateY(180deg);
 }
+#flipCounter, #bestScore {
+  margin-top: 20px;
+  font-size: 1.2em;
+  color: #444;
+  text-align: center;
+  font-weight: 600;
+}
+#resetBtn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 1.1em;
+  background-color: #f592b2;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+#resetBtn:hover {
+  background-color: #e06b8a;
+}
+
+
