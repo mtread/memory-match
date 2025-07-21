@@ -10,42 +10,62 @@ function shuffle(array) {
   }
 }
 
-shuffle(cards);
+let flipCount = 0;
+let bestScore = localStorage.getItem('bestScore') || null;
 
-// 🎯 Step 3: Render the cards
+// Display initial best score or --
+const flipCounterEl = document.getElementById('flipCounter');
+const bestScoreEl = document.getElementById('bestScore');
 const board = document.getElementById('gameBoard');
+
+bestScoreEl.textContent = bestScore ? `Best Score: ${bestScore}` : 'Best Score: --';
+
 let firstCard = null;
 let secondCard = null;
 let lockBoard = false;
 
-cards.forEach((emoji, index) => {
-  const card = document.createElement('div');
-  card.classList.add('card');
+// Function to render the cards on the board
+function renderBoard() {
+  board.innerHTML = ''; // Clear existing cards
+  flipCount = 0;
+  flipCounterEl.textContent = `Flips: 0`;
+  firstCard = null;
+  secondCard = null;
+  lockBoard = false;
 
-  const inner = document.createElement('div');
-  inner.classList.add('card-inner');
+  shuffle(cards);
 
-  const front = document.createElement('div');
-  front.classList.add('card-front');
+  cards.forEach((emoji, index) => {
+    const card = document.createElement('div');
+    card.classList.add('card');
 
-  const back = document.createElement('div');
-  back.classList.add('card-back');
-  back.textContent = emoji;
+    const inner = document.createElement('div');
+    inner.classList.add('card-inner');
 
-  inner.appendChild(front);
-  inner.appendChild(back);
-  card.appendChild(inner);
+    const front = document.createElement('div');
+    front.classList.add('card-front');
 
-  card.addEventListener('click', () => flipCard(card, emoji));
+    const back = document.createElement('div');
+    back.classList.add('card-back');
+    back.textContent = emoji;
 
-  board.appendChild(card);
-});
+    inner.appendChild(front);
+    inner.appendChild(back);
+    card.appendChild(inner);
 
-// 🔁 Step 4: Flip logic
+    card.addEventListener('click', () => flipCard(card, emoji));
+
+    board.appendChild(card);
+  });
+}
+
+// Flip card logic
 function flipCard(card, emoji) {
   if (lockBoard || card.classList.contains('flipped')) return;
 
   card.classList.add('flipped');
+  flipCount++;
+  flipCounterEl.textContent = `Flips: ${flipCount}`;
 
   if (!firstCard) {
     firstCard = { card, emoji };
@@ -56,6 +76,18 @@ function flipCard(card, emoji) {
   lockBoard = true;
 
   if (firstCard.emoji === secondCard.emoji) {
+    // Check if all cards are flipped (game over)
+    if (document.querySelectorAll('.card.flipped').length === cards.length) {
+      if (!bestScore || flipCount < bestScore) {
+        bestScore = flipCount;
+        localStorage.setItem('bestScore', bestScore);
+        bestScoreEl.textContent = `Best Score: ${bestScore}`;
+        alert(`🎉 New Best Score: ${bestScore} flips!`);
+      } else {
+        alert(`Game complete! Your flips: ${flipCount}. Best score: ${bestScore}`);
+      }
+    }
+
     // 🎉 Match found!
     firstCard = null;
     secondCard = null;
@@ -71,3 +103,12 @@ function flipCard(card, emoji) {
     }, 1000);
   }
 }
+
+// Setup reset button event listener
+const resetBtn = document.getElementById('resetBtn');
+resetBtn.addEventListener('click', () => {
+  renderBoard();
+});
+
+// Initial board render on page load
+renderBoard();
